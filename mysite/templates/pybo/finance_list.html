@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load pybo_filter %}
+{% block content %}
+<div class="container my-3">
+    <table class="table">
+        <thead>
+        <tr class="thead-dark">
+            <th>No.</th>
+            <th>날짜</th>
+            <th>시가</th>
+            <th>종가</th>
+            <th>고가</th>
+            <th>저가</th>
+            <th>거래량</th>
+            <th>변화율</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if finance_list %}
+        {% for finance in finance_list %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ finance.Date}}</td>
+            <td>{{ finance.Open }}</td>
+            <td>{{ finance.Close }}</td>
+            <td>{{ finance.High }}</td>
+            <td>{{ finance.Low }}</td>
+            <td>{{ finance.Change }}</td>
+            {% if finance.Volume > 0 %}
+            <td class="text-danger">{{ finance.Volume }}</td>
+            {% else %}
+            <td class="text-primary" >{{ finance.Volume }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="3">질문이 없습니다.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <!-- 페이징처리 시작 -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전페이지 -->
+        {% if finance_list.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ finance_list.previous_page_number }}">이전</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+        </li>
+        {% endif %}
+        <!-- 페이지리스트 -->
+        {% for page_number in finance_list.paginator.page_range %}
+        {% if page_number >= finance_list.number|add:-5 and page_number <= finance_list.number|add:5 %}
+            {% if page_number == finance_list.number %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+        <!-- 다음페이지 -->
+        {% if finance_list.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ finance_list.next_page_number }}">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- 페이징처리 끝 -->
+</div>
+{% endblock %}

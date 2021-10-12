@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load pybo_filter %}
+{% block content %}
+
+<div class="container my-3">
+    <table class="table">
+        <thead>
+        <tr class="thead-dark">
+            <th>Symbol</th>
+            <th>Market</th>
+            <th>Name</th>
+            <th>Watch Graph</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if Kosdaq_list %}
+        <tr>
+            <td>{{ Kosdaq_list.Symbol}}</td>
+            <td>{{ Kosdaq_list.Market }}</td>
+            <td>{{ Kosdaq_list.Name }}</td>
+            <td><a href="{% url 'pybo:graph' Kosdaq_list.Symbol %}"><string>그래프 보기</string></a></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">질문이 없습니다.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container my-3">
+    <table class="table">
+        <thead>
+        <tr class="thead-dark">
+            <th>No.</th>
+            <th>날짜</th>
+            <th>시가</th>
+            <th>종가</th>
+            <th>고가</th>
+            <th>저가</th>
+            <th>변화율</th>
+            <th>거래량</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if d %}
+        {% for finance in d %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ finance.Date}}</td>
+            <td>{{ finance.Open }}</td>
+            <td>{{ finance.Close }}</td>
+            <td>{{ finance.High }}</td>
+            <td>{{ finance.Low }}</td>
+            <td>{{ finance.Volume }}</td>
+            {% if finance.Change > 0 %}
+            <td class="text-danger">{{ finance.Change}}%</td>
+            {% else %}
+            <td class="text-primary" >{{ finance.Change}}%</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="3">질문이 없습니다.</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+    <!-- 페이징처리 시작 -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전페이지 -->
+        {% if d.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ d.previous_page_number }}">이전</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+        </li>
+        {% endif %}
+        <!-- 페이지리스트 -->
+        {% for page_number in d.paginator.page_range %}
+        {% if page_number >= d.number|add:-5 and page_number <= d.number|add:5 %}
+            {% if page_number == d.number %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+        <!-- 다음페이지 -->
+        {% if list.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ d.next_page_number }}">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- 페이징처리 끝 -->
+</div>
+
+{% endblock %}
